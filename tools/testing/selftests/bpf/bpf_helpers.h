@@ -228,6 +228,10 @@ static void *(*bpf_sk_storage_get)(void *map, struct bpf_sock *sk,
 static int (*bpf_sk_storage_delete)(void *map, struct bpf_sock *sk) =
 	(void *)BPF_FUNC_sk_storage_delete;
 static int (*bpf_send_signal)(unsigned sig) = (void *)BPF_FUNC_send_signal;
+static int (*bpf_extfuse_read_args)(void *ctx, int param, void *unsafe_ptr, int size) =
+	(void *) BPF_FUNC_extfuse_read_args;
+static int (*bpf_extfuse_write_args)(void *ctx, int param, const void *unsafe_ptr, int size) =
+	(void *) BPF_FUNC_extfuse_write_args;
 
 /* llvm builtin functions that eBPF C program may use to
  * emit BPF_LD_ABS and BPF_LD_IND instructions

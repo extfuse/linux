@@ -7,6 +7,7 @@
 */
 
 #include "fuse_i.h"
+#include "extfuse_i.h"
 
 #include <linux/init.h>
 #include <linux/module.h>
@@ -579,6 +580,8 @@ static void __fuse_request_send(struct fuse_conn *fc, struct fuse_req *req)
 
 void fuse_request_send(struct fuse_conn *fc, struct fuse_req *req)
 {
+	if (extfuse_request_send(fc, req) != -ENOSYS)
+		return;
 	__set_bit(FR_ISREPLY, &req->flags);
 	if (!test_bit(FR_WAITING, &req->flags)) {
 		__set_bit(FR_WAITING, &req->flags);

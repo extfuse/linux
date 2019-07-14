@@ -6090,6 +6090,15 @@ F:	include/linux/efi*.h
 F:	arch/arm/boot/compressed/efi-header.S
 F:	arch/arm64/kernel/efi-entry.S
 
+EXTFUSE: EXTENSION FRAMEWORK FOR FUSE
+M:	Ashish Bijlani <ashish.bijlani@gmail.edu>
+W:	https://extfuse.github.io
+T:	git https://github.com/extfuse/linux.git
+S:	Maintained
+F:	fs/fuse/extfuse*
+F:	include/linux/extfuse.h
+F:	Documentation/filesystems/extfuse.txt
+
 EXTERNAL CONNECTOR SUBSYSTEM (EXTCON)
 M:	MyungJoo Ham <myungjoo.ham@samsung.com>
 M:	Chanwoo Choi <cw00.choi@samsung.com>
