@@ -101,6 +101,8 @@ int extfuse_load_prog(struct fuse_conn *fc, int fd)
 	if (old_prog)
 		bpf_prog_put(old_prog);
 
+	fc->fc_priv = (void *)data;
+
 	pr_info("ExtFUSE bpf prog loaded fd=%d\n", fd);
 	return 0;
 }
