@@ -121,68 +121,86 @@ BPF_CALL_4(bpf_extfuse_read_args, void *, src, u32, type, void *, dst, size_t,
 	const void *inptr = NULL;
 	int ret = -EINVAL;
 
-	if (type == OPCODE && size == sizeof(uint32_t))
+	switch (type) {
+	case OPCODE:
+		if (size != sizeof(uint32_t))
+			return -EINVAL;
 		inptr = (void *)&req->in.h.opcode;
-
-	else if (type == NODEID && size == sizeof(uint64_t))
+		break;
+	case NODEID:
+		if (size != sizeof(uint64_t))
+			return -EINVAL;
 		inptr = (void *)&req->in.h.nodeid;
-
-	else if (type == NUM_IN_ARGS && size == sizeof(unsigned))
+		break;
+	case NUM_IN_ARGS:
+		if (size != sizeof(unsigned))
+			return -EINVAL;
 		inptr = (void *)&req->in.numargs;
-
-	else if (type == NUM_OUT_ARGS && size == sizeof(unsigned))
+		break;
+	case NUM_OUT_ARGS:
+		if (size != sizeof(unsigned))
+			return -EINVAL;
 		inptr = (void *)&req->out.numargs;
-
-	// input param 0
-	else if (type == IN_PARAM_0_SIZE && size == sizeof(unsigned) &&
-		 num_in_args >= 1 && num_in_args <= 3)
+		break;
+	case IN_PARAM_0_SIZE:
+		if (size != sizeof(unsigned) || num_in_args < 1 ||
+		    num_in_args > 3)
+			return -EINVAL;
 		inptr = &req->in.args[0].size;
-
-	else if (type == IN_PARAM_0_VALUE && num_in_args >= 1 &&
-		 num_in_args <= 3) {
-		ret = -E2BIG;
-		if (size >= req->in.args[0].size) {
-			size = req->in.args[0].size;
-			inptr = req->in.args[0].value;
-		}
-	}
-
-	// input param 1
-	else if (type == IN_PARAM_1_SIZE && size == sizeof(unsigned) &&
-		 num_in_args >= 2 && num_in_args <= 3)
+		break;
+	case IN_PARAM_0_VALUE:
+		if (num_in_args < 1 || num_in_args > 3)
+			return -EINVAL;
+		if (size < req->in.args[0].size)
+			return -E2BIG;
+		size = req->in.args[0].size;
+		inptr = req->in.args[0].value;
+		break;
+	case IN_PARAM_1_SIZE:
+		if (size != sizeof(unsigned) || num_in_args < 2 ||
+		    num_in_args > 3)
+			return -EINVAL;
 		inptr = &req->in.args[1].size;
-
-	else if (type == IN_PARAM_1_VALUE && num_in_args >= 2 &&
-		 num_in_args <= 3) {
-		ret = -E2BIG;
-		if (size >= req->in.args[1].size) {
-			size = req->in.args[1].size;
-			inptr = req->in.args[1].value;
-		}
-	}
-
-	// input param 2
-	else if (type == IN_PARAM_2_SIZE && size == sizeof(unsigned) &&
-		 num_in_args == 3)
-		inptr = &req->in.args[1].size;
-
-	else if (type == IN_PARAM_2_VALUE && num_in_args == 3) {
-		ret = -E2BIG;
-		if (size >= req->in.args[2].size) {
-			size = req->in.args[2].size;
-			inptr = req->in.args[2].value;
-		}
-	}
-
-	// output param 2
-	else if (type == OUT_PARAM_0 && num_out_args >= 1 &&
-		 num_out_args <= 2 && size == req->out.args[0].size)
+		break;
+	case IN_PARAM_1_VALUE:
+		if (num_in_args < 2 || num_in_args > 3)
+			return -EINVAL;
+		if (size < req->in.args[1].size)
+			return -E2BIG;
+		size = req->in.args[1].size;
+		inptr = req->in.args[1].value;
+		break;
+	case IN_PARAM_2_SIZE:
+		if (size != sizeof(unsigned) || num_in_args != 3)
+			return -EINVAL;
+		inptr = &req->in.args[2].size;
+		break;
+	case IN_PARAM_2_VALUE:
+		if (num_in_args != 3)
+			return -EINVAL;
+		if (size < req->in.args[2].size)
+			return -E2BIG;
+		size = req->in.args[2].size;
+		inptr = req->in.args[2].value;
+		break;
+	case OUT_PARAM_0:
+		if (num_out_args < 1 || num_out_args > 2)
+			return -EINVAL;
+		if (size != req->out.args[0].size)
+			return -E2BIG;
 		inptr = req->out.args[0].value;
-
-	// output param 3
-	else if (type == OUT_PARAM_1 && num_out_args == 2 &&
-		 size == req->out.args[1].size)
+		break;
+	case OUT_PARAM_1:
+		if (num_out_args != 2)
+			return -EINVAL;
+		if (size != req->out.args[1].size)
+			return -E2BIG;
 		inptr = req->out.args[1].value;
+		break;
+	default:
+		return -EBADRQC;
+		break;
+	}
 
 	if (!inptr) {
 		pr_err("Invalid input to %s type: %d num_in_args: %d "
