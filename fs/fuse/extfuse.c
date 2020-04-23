@@ -105,9 +105,17 @@ int extfuse_load_prog(struct fuse_conn *fc, int fd)
 	return 0;
 }
 
-BPF_CALL_4(bpf_extfuse_read_args, void *, p, u32, type, void *, dst, u32, size)
+/**
+ * int bpf_extfuse_read_args(): attempts to copy the requested src field to dst.
+ * @src: a pointer to a extfuse_req data structure
+ * @type: Specifies what field of the src data structure to be copied to dst
+ * @dst: a pointer to the container that will be filled with the requested data
+ * @size: size of the data chunk to be copied to dst
+ */
+BPF_CALL_4(bpf_extfuse_read_args, void *, src, u32, type, void *, dst, size_t,
+	   size)
 {
-	struct extfuse_req *req = (struct extfuse_req *)p;
+	struct extfuse_req *req = (struct extfuse_req *)src;
 	unsigned num_in_args = req->in.numargs;
 	unsigned num_out_args = req->out.numargs;
 	const void *inptr = NULL;
@@ -200,10 +208,17 @@ static const struct bpf_func_proto bpf_extfuse_read_args_proto = {
 	.arg4_type	= ARG_CONST_SIZE,
 };
 
-BPF_CALL_4(bpf_extfuse_write_args, void *, p, u32, type, const void *, src, u32,
-	   size)
+/**
+ * int bpf_extfuse_write_args(): attempts to copy the src field to dst.
+ * @src: a pointer to a extfuse_req data structure
+ * @type: Specifies what field of the src data structure to be copied to dst
+ * @dst: a pointer to the container that will be filled with the requested data
+ * @size: size of the data chunk to be copied to dst
+ */
+BPF_CALL_4(bpf_extfuse_write_args, void *, dst, u32, type, const void *, src,
+	   u32, size)
 {
-	struct extfuse_req *req = (struct extfuse_req *)p;
+	struct extfuse_req *req = (struct extfuse_req *)dst;
 	unsigned numargs = req->out.numargs;
 	void *outptr = NULL;
 	int ret = -EINVAL;
