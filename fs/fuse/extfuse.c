@@ -259,16 +259,20 @@ static const struct bpf_func_proto *
 bpf_extfuse_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {
 	switch (func_id) {
+	case BPF_FUNC_extfuse_read_args:
+		return &bpf_extfuse_read_args_proto;
+	case BPF_FUNC_extfuse_write_args:
+		return &bpf_extfuse_write_args_proto;
 	case BPF_FUNC_map_lookup_elem:
 		return &bpf_map_lookup_elem_proto;
 	case BPF_FUNC_map_update_elem:
 		return &bpf_map_update_elem_proto;
 	case BPF_FUNC_map_delete_elem:
 		return &bpf_map_delete_elem_proto;
-	case BPF_FUNC_extfuse_read_args:
-		return &bpf_extfuse_read_args_proto;
-	case BPF_FUNC_extfuse_write_args:
-		return &bpf_extfuse_write_args_proto;
+	case BPF_FUNC_tail_call:
+		return &bpf_tail_call_proto;
+	case BPF_FUNC_trace_printk:
+		return bpf_get_trace_printk_proto();
 	default:
 		return NULL;
 	}
