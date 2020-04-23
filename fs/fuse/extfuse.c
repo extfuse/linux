@@ -206,7 +206,7 @@ BPF_CALL_4(bpf_extfuse_read_args, void *, src, u32, type, void *, dst, size_t,
 
 	if (!inptr) {
 		pr_err("Invalid input to %s type: %d num_in_args: %d "
-		       "num_out_args: %d size: %d\n",
+		       "num_out_args: %d size: %ld\n",
 		       __func__, type, num_in_args, num_out_args, size);
 		return ret;
 	}
